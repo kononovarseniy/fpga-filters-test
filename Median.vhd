@@ -5,32 +5,33 @@ use ieee.numeric_std.all;
 
 entity Median is
 	generic (
+		data_bits: positive := 8;
 		window: integer := 3
 	);
 	port (
 		clk_i: in std_logic;
 		reset_i: in std_logic;
-		signal_i: in integer;
-		signal_o: out integer
+		signal_i: in unsigned(data_bits - 1 downto 0);
+		signal_o: out unsigned(data_bits - 1 downto 0)
 	);
 end entity;
 
 architecture rtl of Median is
 
-	type window_type is array (0 to window - 1) of integer;
+	type window_type is array (0 to window - 1) of unsigned(data_bits - 1 downto 0);
 	signal w, sw: window_type;
 
 begin
 	
 	process (clk_i) is
-	variable rem_val, add_val: integer;
+	variable rem_val, add_val: unsigned(data_bits - 1 downto 0);
 	begin
 		if rising_edge(clk_i) then
 			if reset_i = '1' then
 				for i in 0 to window - 1 loop
 					w(i) <= signal_i;
 					sw(i) <= signal_i;
-					signal_o <= 0;
+					signal_o <= to_unsigned(0, data_bits);
 				end loop;
 			else
 				if window mod 2 = 1 then

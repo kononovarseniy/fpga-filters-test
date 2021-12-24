@@ -3,6 +3,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+
 entity Filters is
 	port (
 		clk_i: in std_logic;
@@ -16,13 +17,14 @@ architecture rtl of Filters is
 
 	component Median is
 		generic (
+			data_bits: positive := 8;
 			window: integer := 3
 		);
 		port (
 			clk_i: in std_logic;
 			reset_i: in std_logic;
-			signal_i: in integer;
-			signal_o: out integer
+			signal_i: in unsigned(data_bits - 1 downto 0);
+			signal_o: out unsigned(data_bits - 1 downto 0)
 		);
 	end component;
 	
@@ -39,23 +41,24 @@ architecture rtl of Filters is
 		);
 	end component;
 
---	signal input_s: integer;
---	signal output_s: integer;
+	signal input_s: unsigned(4 downto 0);
+	signal output_s: unsigned(4 downto 0);
 	signal input_s2: unsigned(4 downto 0);
 	signal output_s2: unsigned(4 downto 0);
 	
 begin
 	
---	med: Median
---		generic map (
---			window => 3
---		)
---		port map (
---			clk_i => clk_i,
---			reset_i => reset_i,
---			signal_i => input_s,
---			signal_o => output_s
---		);
+	med: Median
+		generic map (
+			data_bits => 5,
+			window => 3
+		)
+		port map (
+			clk_i => clk_i,
+			reset_i => reset_i,
+			signal_i => input_s,
+			signal_o => output_s
+		);
 		
 	rc: LowFreq
 		generic map (
@@ -69,8 +72,8 @@ begin
 			signal_o => output_s2
 		);
 	
---	input_s <= to_integer(unsigned(signal_i));
---	signal_o <= std_logic_vector(to_unsigned(output_s, signal_o'length));
+--	input_s <= unsigned(signal_i);
+--	signal_o <= std_logic_vector(output_s);
 	input_s2 <= unsigned(signal_i);
 	signal_o <= std_logic_vector(output_s2);
 	process (clk_i) is
