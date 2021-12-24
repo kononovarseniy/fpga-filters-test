@@ -25,25 +25,54 @@ architecture rtl of Filters is
 			signal_o: out integer
 		);
 	end component;
+	
+	component LowFreq is
+		generic (
+			data_bits: positive := 8;
+			param_a: positive
+		);
+		port (
+			clk_i: in std_logic;
+			reset_i: in std_logic;
+			signal_i: in unsigned(data_bits - 1 downto 0);
+			signal_o: out unsigned(data_bits - 1 downto 0)
+		);
+	end component;
 
-	signal input_s: integer;
-	signal output_s: integer;
+--	signal input_s: integer;
+--	signal output_s: integer;
+	signal input_s2: unsigned(4 downto 0);
+	signal output_s2: unsigned(4 downto 0);
 	
 begin
 	
-	med: Median
+--	med: Median
+--		generic map (
+--			window => 3
+--		)
+--		port map (
+--			clk_i => clk_i,
+--			reset_i => reset_i,
+--			signal_i => input_s,
+--			signal_o => output_s
+--		);
+		
+	rc: LowFreq
 		generic map (
-			window => 3
+			data_bits => 5,
+			param_a => 30
 		)
 		port map (
 			clk_i => clk_i,
 			reset_i => reset_i,
-			signal_i => input_s,
-			signal_o => output_s
+			signal_i => input_s2,
+			signal_o => output_s2
 		);
 	
-	input_s <= to_integer(unsigned(signal_i));
-	signal_o <= std_logic_vector(to_unsigned(output_s, signal_o'length));
+--	input_s <= to_integer(unsigned(signal_i));
+--	signal_o <= std_logic_vector(to_unsigned(output_s, signal_o'length));
+	input_s2 <= unsigned(signal_i);
+	signal_o <= std_logic_vector(output_s2);
 	process (clk_i) is
 	begin
 		if rising_edge(clk_i) then
