@@ -8,8 +8,8 @@ entity Filters is
 	port (
 		clk_i: in std_logic;
 		reset_i: in std_logic;
-		signal_i: in std_logic_vector(4 downto 0);
-		signal_o: out std_logic_vector(4 downto 0)
+		signal_i: in std_logic_vector(9 downto 0);
+		signal_o: out std_logic_vector(9 downto 0)
 	);
 end entity;
 
@@ -17,7 +17,7 @@ architecture rtl of Filters is
 
 	component Median is
 		generic (
-			data_bits: positive := 8;
+			data_bits: positive := 10;
 			window: integer := 3
 		);
 		port (
@@ -30,7 +30,7 @@ architecture rtl of Filters is
 	
 	component LowFreq is
 		generic (
-			data_bits: positive := 8;
+			data_bits: positive := 10;
 			param_a: positive
 		);
 		port (
@@ -41,41 +41,43 @@ architecture rtl of Filters is
 		);
 	end component;
 
-	signal input_s: unsigned(4 downto 0);
-	signal output_s: unsigned(4 downto 0);
-	signal input_s2: unsigned(4 downto 0);
-	signal output_s2: unsigned(4 downto 0);
+	signal med_in, med_out, low_in, low_out: unsigned(9 downto 0);
+	signal input_s: unsigned(9 downto 0);
+	signal output_s: unsigned(9 downto 0);
 	
 begin
 	
 	med: Median
 		generic map (
-			data_bits => 5,
+			data_bits => 10,
 			window => 3
 		)
 		port map (
 			clk_i => clk_i,
 			reset_i => reset_i,
-			signal_i => input_s,
-			signal_o => output_s
+			signal_i => med_in,
+			signal_o => med_out
 		);
 		
 	rc: LowFreq
 		generic map (
-			data_bits => 5,
-			param_a => 30
+			data_bits => 10,
+			param_a => 10
 		)
 		port map (
 			clk_i => clk_i,
 			reset_i => reset_i,
-			signal_i => input_s2,
-			signal_o => output_s2
+			signal_i => low_in,
+			signal_o => low_out
 		);
 	
---	input_s <= unsigned(signal_i);
---	signal_o <= std_logic_vector(output_s);
-	input_s2 <= unsigned(signal_i);
-	signal_o <= std_logic_vector(output_s2);
+	input_s <= unsigned(signal_i);
+	signal_o <= std_logic_vector(output_s);
+	
+	med_in <= input_s;
+	low_in <= med_out;
+	output_s <= low_out;
+	
 	process (clk_i) is
 	begin
 		if rising_edge(clk_i) then

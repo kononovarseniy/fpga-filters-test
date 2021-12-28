@@ -57,7 +57,7 @@ begin
 						sw(window - 1) <= add_val;
 					end if;
 					for i in 1 to window - 2 loop
-						if sw(i) < rem_val and sw(i) < add_val then
+						if sw(i) < rem_val then
 							sw(i) <= sw(i);
 						elsif sw(i) >= rem_val and sw(i) < add_val then
 							if sw(i + 1) >= add_val then
@@ -79,9 +79,9 @@ begin
 					end if;
 					
 					for i in 1 to window - 2 loop
-						if sw(i) < rem_val and sw(i) < add_val then
+						if sw(i) < add_val then
 							sw(i) <= sw(i);
-						elsif sw(i) < rem_val and sw(i) >= add_val then
+						elsif sw(i) >= add_val and sw(i) < rem_val then
 							if sw(i - 1) < add_val then
 								sw(i) <= add_val;
 							else
